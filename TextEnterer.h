@@ -113,7 +113,7 @@ public:
         int index = GetAnyKey();
         if (index == None) return '\0';
 
-        if (IsKeyPressed(Key::LShift) || IsKeyPressed(Key::RShift)) {
+        if (GetAsyncKeyState(VK_LSHIFT) || GetAsyncKeyState(VK_SHIFT)) {
             return text_shift[index];
         }
         

@@ -1,4 +1,3 @@
-#include <iostream>
 #include <Windows.h>
 
 enum Key {
@@ -14,7 +13,7 @@ private:
     bool on_press[256]{ 0 };
     int n_keys;
     std::string text_noshift = "abcdefghijklmnopqrstuvwxyz0123456789[];,.'\\/`=- ";
-    std::string text_shift = "ABCDEFGHIJKLMNOPQRSTUVWXYZ)!@#$%^&*({}:<>'|?~+_ ";
+    std::string text_shift   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ)!@#$%^&*({}:<>\" |?~+_ ";
     TextEnterer() {
         n_keys = 49;
     }
@@ -87,15 +86,12 @@ public:
         case Key::LShift:           vkey = VK_LSHIFT;     break;
         case Key::RShift:           vkey = VK_RSHIFT;     break;
         }
-        
-        // On Key Press
+
         if (GetAsyncKeyState(vkey) < 0 && !on_press[vkey]) {
             on_press[vkey] = true;
         
             return true;
         }
-        
-        // On Key Release
         if (GetAsyncKeyState(vkey) == 0 && on_press[vkey]) {
             on_press[vkey] = false;
         }
@@ -113,15 +109,14 @@ public:
         return None;
     }
 
-    void EnterText() {
+    char EnterText() {
         int index = GetAnyKey();
-        if (index == None) return;
+        if (index == None) return '\0';
 
         if (IsKeyPressed(Key::LShift) || IsKeyPressed(Key::RShift)) {
-            std::cout << text_shift[index] << std::endl;
+            return text_shift[index];
         }
-        else {
-            std::cout << text_noshift[index] << std::endl;
-        }
+        
+        return text_noshift[index];
     }
 };

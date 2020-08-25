@@ -87,12 +87,15 @@ public:
         case Key::LShift:           vkey = VK_LSHIFT;     break;
         case Key::RShift:           vkey = VK_RSHIFT;     break;
         }
-
+        
+        // On Key Press
         if (GetAsyncKeyState(vkey) < 0 && !on_press[vkey]) {
             on_press[vkey] = true;
         
             return true;
         }
+        
+        // On Key Release
         if (GetAsyncKeyState(vkey) == 0 && on_press[vkey]) {
             on_press[vkey] = false;
         }

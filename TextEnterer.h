@@ -1,25 +1,27 @@
+#pragma once
 #include <Windows.h>
+#include <string>
 
 enum Key {
     None = -1,
     A = 0, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
     Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
     LBracket, RBracket, Semicolon, Comma, Period, Quote, ForwardSlash, BackwardSlash,
-    Tilda, Equal, Hyphen, Space, LShift, RShift,
+    Tilda, Equal, Hyphen, Space
 };
 
-class TextEnterer {
+class TextInput {
 private:
     bool on_press[256]{ 0 };
     int n_keys;
-    std::string text_noshift = "abcdefghijklmnopqrstuvwxyz0123456789[];,.'\\/`=- ";
-    std::string text_shift   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ)!@#$%^&*({}:<>\" |?~+_ ";
-    TextEnterer() {
-        n_keys = 49;
+    std::string text_noshift = "abcdefghijklmnopqrstuvwxyz0123456789[];,.'/\\`=- ";
+    std::string text_shift =   "ABCDEFGHIJKLMNOPQRSTUVWXYZ)!@#$%^&*({}:<>\"?|~+_ ";
+    TextInput() {
+        n_keys = 47;
     }
 public:
-    static TextEnterer& Get() {
-        static TextEnterer text_enterer;
+    static TextInput& Get() {
+        static TextInput text_enterer;
         return text_enterer;
     }
 
@@ -68,7 +70,7 @@ public:
         case Key::Num7:             vkey = '7';           break;
         case Key::Num8:             vkey = '8';           break;
         case Key::Num9:             vkey = '9';           break;
-        
+
         case Key::LBracket:         vkey = VK_OEM_4;      break;
         case Key::RBracket:         vkey = VK_OEM_6;      break;
         case Key::Semicolon:        vkey = VK_OEM_1;      break;
@@ -80,16 +82,13 @@ public:
         case Key::Tilda:            vkey = VK_OEM_3;      break;
         case Key::Equal:            vkey = VK_OEM_PLUS;   break;
         case Key::Hyphen:           vkey = VK_OEM_MINUS;  break;
-        
+
         case Key::Space:            vkey = VK_SPACE;      break;
-        
-        case Key::LShift:           vkey = VK_LSHIFT;     break;
-        case Key::RShift:           vkey = VK_RSHIFT;     break;
         }
 
         if (GetAsyncKeyState(vkey) < 0 && !on_press[vkey]) {
             on_press[vkey] = true;
-        
+
             return true;
         }
         if (GetAsyncKeyState(vkey) == 0 && on_press[vkey]) {
@@ -101,7 +100,7 @@ public:
 
     int GetAnyKey() {
         bool is_press = false;
-        for (int i = 0; i < n_keys - 2; i++) {
+        for (int i = 0; i < n_keys; i++) {
             if (IsKeyPressed((Key)i)) {
                 return i;
             }
@@ -113,10 +112,10 @@ public:
         int index = GetAnyKey();
         if (index == None) return '\0';
 
-        if (GetAsyncKeyState(VK_LSHIFT) || GetAsyncKeyState(VK_SHIFT)) {
+        if (GetAsyncKeyState(VK_SHIFT)) {
             return text_shift[index];
         }
-        
+
         return text_noshift[index];
     }
 };

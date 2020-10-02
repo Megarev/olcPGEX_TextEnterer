@@ -47,7 +47,7 @@ public:
     sAppName = "Title";
   }
   
-  bool OnUserCreate() pverride {
+  bool OnUserCreate() override {
   
     area = olc::TextArea({ 0, 0 }); // The parameter takes the position of the starting point
     return true;

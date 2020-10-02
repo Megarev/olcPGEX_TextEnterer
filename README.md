@@ -1,5 +1,5 @@
 # olcPGEX_TextEnterer
-A olc::PixelGameEngine Extension for writing text to the window in olc::PGE
+A olc::PixelGameEngine (javidx9) Extension for writing text to the window in olc::PGE
 At the moment it has support only for Windows
 
 Here is a basic program that allows you to write text
@@ -36,3 +36,31 @@ But this only allows you enter text in a line
 It also doesn't allow you to add a new line and also backspace
 
 For this there is another class **Text Area**
+```cpp
+#define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
+
+class TextApp : public olc::PixelGameEngine {
+private:
+  olc::TextArea area;
+public:
+  TextApp() {
+    sAppName = "Title";
+  }
+  
+  bool OnUserCreate() pverride {
+  
+    area = olc::TextArea({ 0, 0 }); // The parameter takes the position of the starting point
+    return true;
+  }
+  
+  bool OnUserUpdate(float fElapsedTime) override {
+  
+    area.Input(this);
+    area.Draw(this, olc::WHITE);
+  
+    return true;
+  }
+}
+```
+**Text Area** however doesn't allow you to copy-paste, select text at the moment

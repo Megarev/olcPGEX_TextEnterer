@@ -33,8 +33,8 @@ public:
   }
 };
 ```
-But this only allows you enter text in a line
-For more functionality there is **Text Area** class
+But this only allows you enter text in a line.
+For more functionality there is **Text Area** class.
 ```cpp
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
@@ -62,4 +62,4 @@ public:
   }
 }
 ```
-**Text Area** however doesn't allow you to copy-paste and select text at the moment
+**Text Area** however doesn't allow you to copy-paste and select text at the moment.

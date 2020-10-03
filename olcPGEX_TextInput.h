@@ -1,37 +1,3 @@
-/*
-# License (OLC-3)
-
-Copyright 2018-2020 OneLoneCoder.com
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions 
-are met:
-
-1. Redistributions or derivations of source code must retain the above 
-   copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions or derivative works in binary form must reproduce 
-   the above copyright notice. This list of conditions and the following 
-   disclaimer must be reproduced in the documentation and/or other 
-   materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its 
-   contributors may be used to endorse or promote products derived 
-   from this software without specific prior written permission.
-    
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
 #pragma once
 #include "olcPixelGameEngine.h"
 #include <Windows.h>
@@ -167,26 +133,45 @@ namespace olc {
         TextArea(const olc::vi2d& start_pos, uint32_t text_scale = 1)
             : position(start_pos), cursor_pos(start_pos), scale(text_scale) {}
 
+        void Initialize(const olc::vi2d& start_pos, uint32_t text_scale = 1) {
+            position = start_pos;
+            cursor_pos = start_pos;
+            scale = text_scale;
+        }
+
         void Input(olc::PixelGameEngine* pge) {
 
             if (!pge->IsFocused()) return;
 
-            char c = TextInput::Get().EnterText();
-            if (c != '\0') {
-                std::string str = text_stream.str();
-                
-                // Calculate the index at which cursor is
-                int pos = (cursor_pos.x - position.x) / (8 * (int)scale);
-                
-                // Find the position by iterator
+            auto FindPos = [&](std::string& str, int offset = 0) {
+                int pos = (cursor_pos.x - position.x) / (8 * (int)scale) - offset;
                 std::string::iterator it = str.begin();
                 int n = 0;
                 while (n != pos) {
                     it++;
                     n++;
                 }
+
+                return it;
+            };
+
+            auto FindPosFromVector = [&](int offset = 0) {
+                std::vector<std::string>::iterator it = lines.begin();
+                int n = 0;
+                while (n != index + offset) {
+                    it++;
+                    n++;
+                }
+
+                return it;
+            };
+
+            char c = TextInput::Get().EnterText();
+            if (c != '\0') {
+                std::string str = text_stream.str();
+                
                 // Add it into the string
-                str.insert(it, c);
+                str.insert(FindPos(str), c);
                 text_stream.str("");
                 text_stream << str;
                 lines[index] = text_stream.str();
@@ -196,23 +181,16 @@ namespace olc {
             }
 
             if (pge->GetKey(olc::ENTER).bPressed) {
-                std::vector<std::string>::iterator it = lines.begin();
-
                 int pos = (cursor_pos.x - position.x) / (8 * (int)scale);
                 std::string line_string_original = lines[index].substr(0, pos); // Sub-string from 0 to pos
                 std::string line_string = lines[index].substr(pos); // Sub-string from pos to string_size
 
                 // Find the index at which new line was done
-                int n = 0;
-                while (n != index + 1) {
-                    it++;
-                    n++;
-                }
 
                 // Set original string (the line from which new line was done)
                 lines[index] = std::move(line_string_original);
                 // Insert a new string with the sub-string from pos to string_size
-                lines.insert(it, line_string);
+                lines.insert(FindPosFromVector(1), line_string);
                 text_stream.str("");
                 text_stream << line_string;
                 index++; // Add to index variable
@@ -257,18 +235,11 @@ namespace olc {
                     else {
                         // Find the string by calculating the index at which the cursor_pos is
                         // It works for mono-spaced fonts only
-                        std::string::iterator it = original_str.begin();
-                        int n = 0;
                         int pos = (cursor_pos.x - position.x) / (8 * (int)scale) - 1;
                         
                         // Check if pos >= 0 to avoid out of bounds
                         if (pos >= 0) {
-                            while (n != pos) {
-                                it++;
-                                n++;
-                            }
-
-                            original_str.erase(it);
+                            original_str.erase(FindPos(original_str, 1));
 
                             // Set string and string at index to the original string
                             text_stream.str("");
@@ -284,20 +255,10 @@ namespace olc {
                     // If cursor position isn't the first line and there are more than 1 lines
                     if (lines.size() > 1 && index > 0) {
 
-                        // Take out the line from in between/back of the lines vector
-                        int n = 0;
-                        std::vector<std::string>::iterator it = lines.begin();
-                        int pos = (cursor_pos.x - position.x) / (8 * (int)scale);
-                        
-                        while (n != index) {
-                            n++;
-                            it++;
-                        }
-                        
                         // Current Line is the line which is currently in the active line
                         std::string current_line = lines[index];
                         
-                        lines.erase(it);
+                        lines.erase(FindPosFromVector());
                         index--;
 
                         // Set the string in the previous line by adding the string from current_line

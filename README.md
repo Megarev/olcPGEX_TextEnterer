@@ -79,7 +79,7 @@ public:
 
 	bool OnUserCreate() override {
 
-		box.Initialize(10, 10, 100, 25, olc::BLUE, 2, 6); //Parameters are (pos_x, pos_y, size_x, size_y, box_color, text_scale, text_limit)
+		box.Initialize(10, 10, 100, 25, olc::BLUE, 2, 6); //Parameters are (pos_x, pos_y, size_x, size_y, box_color, text_scale, characters_limit)
 
 		return true;
 	}

@@ -1,5 +1,6 @@
 # olcPGEX_TextEnterer
 To use the extension you've to first download the [olc::PixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine).
+Thanks to scripticuk for doing the key-map bindings
 
 A olc::PixelGameEngine Extension for writing text to the window in olc::PGE.
 Here is a basic program that allows you to write text

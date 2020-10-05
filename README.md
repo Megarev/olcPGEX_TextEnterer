@@ -69,7 +69,7 @@ public:
 ```
 **Text Area** however doesn't allow you to copy-paste and select text at the moment.
 
-There are also **Text Box**
+There is also **Text Box**
 ```cpp
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"

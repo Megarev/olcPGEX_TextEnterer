@@ -96,7 +96,7 @@ public:
 	}
 };
 ```
-You can also manually move the text boxes using the mouse, enable is_mouse_move flag in OnUserCreate
+You can also manually move the text boxes using the mouse, enable is_mouse_move flag in OnUserCreate()
 ```cpp
 box.SetMouseMovement(true);
 ```

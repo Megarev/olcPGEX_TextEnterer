@@ -2,7 +2,6 @@
 To use the extension you've to first download the [olc::PixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine).
 
 A olc::PixelGameEngine Extension for writing text to the window in olc::PGE.
-At the moment it has support only for **Windows**.
 Here is a basic program that allows you to write text
 ```cpp
 #define OLC_PGE_APPLICATION
@@ -24,7 +23,7 @@ public:
   
   bool OnUserUpdate(float fElapsedTime) override {
     
-    char c = olc::TextInput::Get().EnterText();
+    char c = olc::TextInput::Get().EnterText(this);
     if (c != '\0') text += c;
     
     DrawString(0, 0, text);
@@ -63,3 +62,40 @@ public:
 }
 ```
 **Text Area** however doesn't allow you to copy-paste and select text at the moment.
+
+There are also **Text Box**
+```cpp
+#define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
+#include "olcPGEX_TextInput.h"
+
+class TextApp : public olc::PixelGameEngine {
+private:
+	olc::TextBox box;
+public:
+	TextApp() {
+		sAppName = "Title";
+	}
+
+	bool OnUserCreate() override {
+
+		box.Initialize(10, 10, 100, 25, olc::BLUE, 2, 6); //Parameters are (pos_x, pos_y, size_x, size_y, box_color, text_scale, text_limit)
+
+		return true;
+	}
+
+	bool OnUserUpdate(float dt) override {
+
+		box.Input(this);
+
+		Clear(olc::BLACK);
+		box.Draw(this, olc::YELLOW);
+
+		return true;
+	}
+};
+```
+You can also manually move the text boxes using the mouse, enable is_mouse_move flag in OnUserCreate
+```cpp
+box.SetMouseMovement(true);
+```

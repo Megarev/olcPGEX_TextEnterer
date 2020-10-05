@@ -1,8 +1,8 @@
 /*
-    License (OLC-3)
-	~~~~~~~~~~~~~~~
+        License (OLC-3)
+        ~~~~~~~~~~~~~~~
 	
-    Copyright 2018 - 2020 OneLoneCoder.com
+        Copyright 2018 - 2020 OneLoneCoder.com
 	Redistribution and use in source and binary forms, with or without modification,
 	are permitted provided that the following conditions are met:
 	1. Redistributions or derivations of source code must retain the above copyright

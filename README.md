@@ -2,6 +2,10 @@
 To use the extension you've to first download the [olc::PixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine).
 Thanks to scripticuk for doing the key-map bindings
 
+At the moment, it contains two classes
+* Text Area - For writing text in the entire window (you can set bounds too)
+* Teat Box - For writing text in a box (it also has an added feature that allows you to move it with the mouse)
+
 A olc::PixelGameEngine Extension for writing text to the window in olc::PGE.
 Here is a basic program that allows you to write text
 ```cpp

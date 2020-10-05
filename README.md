@@ -55,6 +55,7 @@ public:
   bool OnUserUpdate(float fElapsedTime) override {
   
     area.Input(this);
+    Clear(olc::BLACK);
     area.Draw(this, olc::WHITE);
   
     return true;

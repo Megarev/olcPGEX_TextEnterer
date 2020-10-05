@@ -42,6 +42,7 @@ For more functionality there is **Text Area** class.
 ```cpp
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
+#include "olcPGEX_TextInput.h"
 
 class TextApp : public olc::PixelGameEngine {
 private:

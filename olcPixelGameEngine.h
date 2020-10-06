@@ -129,7 +129,7 @@
 
 	Author
 	~~~~~~
-	David Barr, aka javidx9, ©OneLoneCoder 2018, 2019, 2020
+	David Barr, aka javidx9, Â©OneLoneCoder 2018, 2019, 2020
 
 	2.01: Made renderer and platform static for multifile projects
 	2.02: Added Decal destructor, optimised Pixel constructor
@@ -3172,7 +3172,7 @@ namespace olc
 			mapKeys[XK_minus] = Key::MINUS;	// the minus key on any keyboard
 			mapKeys[XK_period] = Key::PERIOD;	// the period key on any keyboard
 
-			mapKeys[XK_Caps_Lock] = Key::CAPS_LOCK;
+			//mapKeys[XK_Caps_Lock] = Key::CAPS_LOCK;
 
 			return olc::OK;
 		}

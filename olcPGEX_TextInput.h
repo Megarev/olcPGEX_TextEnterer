@@ -174,7 +174,7 @@ namespace olc {
 
         void Input(olc::PixelGameEngine* pge) {
 
-            if (!pge->IsFocused()) return;
+            //if (!pge->IsFocused()) return;
 
             auto FindPos = [&](std::string& str, int offset = 0) {
                 int pos = (cursor_pos.x - position.x) / (8 * (int)scale) - offset;
@@ -190,7 +190,7 @@ namespace olc {
 
             auto FindPosFromVector = [&](int offset = 0) {
                 std::vector<std::string>::iterator it = lines.begin();
-                unsigned n = 0;
+                unsigned int n = 0;
                 while (n != index + offset) {
                     it++;
                     n++;
@@ -203,7 +203,7 @@ namespace olc {
             if (c != '\0') {
                 std::string str = text_stream.str();
                 
-                if (text_max_length.x > 0 && (int)str.size() < text_max_length.x) {
+                if (text_max_length.x < 0 || (text_max_length.x > 0 && (int)str.size() < text_max_length.x)) {
 
                     // Add it into the string
                     str.insert(FindPos(str), c);
@@ -217,7 +217,7 @@ namespace olc {
             }
 
             if (pge->GetKey(olc::ENTER).bPressed) {
-                if ((int)lines.size() < text_max_length.y) {
+                if (text_max_length.y < 0 || (int)lines.size() < text_max_length.y) {
                     int pos = (cursor_pos.x - position.x) / (8 * (int)scale);
                     std::string line_string_original = lines[index].substr(0, pos); // Sub-string from 0 to pos
                     std::string line_string = lines[index].substr(pos); // Sub-string from pos to string_size
@@ -233,14 +233,14 @@ namespace olc {
             }
 
             if (pge->GetKey(olc::UP).bPressed) {
-                index = max(index-1, 0); // Move the index up
+                index = max(index - 1, 0); // Move the index up
                 std::string line = lines[index]; // Set string to new index
 
                 text_stream.str("");
                 text_stream << line;
             }
             else if (pge->GetKey(olc::DOWN).bPressed) {
-                index = min(index+1, lines.size() - 1); // Move the index down
+                index = min(index + 1, lines.size() - 1); // Move the index down
                 std::string line = lines[index]; // Set string to new index
 
                 text_stream.str("");
@@ -466,7 +466,7 @@ namespace olc {
 
         void Draw(olc::PixelGameEngine* pge, olc::Pixel text_color = olc::WHITE) {
 
-            int spacing = (int)(std::fabs(size.y - 8 * scale) / 2); // change std::fabsf to std::fabs because of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79700
+            int spacing = (int)(std::fabs((float)size.y - 8 * scale) / 2); // change std::fabsf to std::fabs because of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79700
             spacing = max(spacing, 1);
 
             pge->DrawRect(position, size, text_box_color);

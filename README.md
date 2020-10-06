@@ -1,6 +1,11 @@
 # olcPGEX_TextEnterer
 To use the extension you've to first download the [olc::PixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine).
-Thanks to scripticuk for doing the key-map bindings
+
+People who've contributed to this project
+-----------------------------------------
+- scripticuk - for doing the key map bindings
+- Iornz - for testing and making necessary changes for Linux
+And me :)
 
 At the moment, it contains two classes
 * Text Area - For writing text in the entire window (you can set bounds too)

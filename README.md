@@ -5,7 +5,7 @@ People who've contributed to this project
 -----------------------------------------
 - **scripticuk** - for doing the key map bindings
 - **Iornz** - for testing and making necessary changes for Linux
-And me :)
+- And me too :)
 
 At the moment, it contains two classes
 * Text Area - For writing text in the entire window (you can set bounds too)

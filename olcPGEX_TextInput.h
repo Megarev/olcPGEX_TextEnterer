@@ -30,6 +30,14 @@
 #include "olcPixelGameEngine.h"
 #include <string>
 
+#if __linux__
+
+#undef None // None defined in /usr/include/X11/X.h
+
+#define max(a, b)  (((a) > (b)) ? (a) : (b)) 
+#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
+#endif
+
 enum TextKey {
     None = -1,
     A = 0, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
@@ -109,7 +117,6 @@ namespace olc {
         }
 
         int GetAnyTextKey(olc::PixelGameEngine* pge) {
-            bool is_press = false;
             for (int i = 0; i < n_TextKeys; i++) {
                 if (IsTextKeyPressed(pge, (TextKey)i)) {
                     return i;
@@ -183,7 +190,7 @@ namespace olc {
 
             auto FindPosFromVector = [&](int offset = 0) {
                 std::vector<std::string>::iterator it = lines.begin();
-                int n = 0;
+                unsigned n = 0;
                 while (n != index + offset) {
                     it++;
                     n++;
@@ -226,14 +233,14 @@ namespace olc {
             }
 
             if (pge->GetKey(olc::UP).bPressed) {
-                index = max(index--, 0); // Move the index up
+                index = max(index-1, 0); // Move the index up
                 std::string line = lines[index]; // Set string to new index
 
                 text_stream.str("");
                 text_stream << line;
             }
             else if (pge->GetKey(olc::DOWN).bPressed) {
-                index = min(index++, lines.size() - 1); // Move the index down
+                index = min(index+1, lines.size() - 1); // Move the index down
                 std::string line = lines[index]; // Set string to new index
 
                 text_stream.str("");
@@ -308,7 +315,7 @@ namespace olc {
         void Draw(olc::PixelGameEngine* pge, olc::Pixel color = olc::WHITE) {
 
             int start_pos = position.y;
-            int index_pos = 0;
+            unsigned index_pos = 0;
 
             for (const std::string& str : lines) {
 
@@ -347,7 +354,7 @@ namespace olc {
     public:
         TextBox() {}
         TextBox(const olc::vi2d& pos, const olc::vi2d& box_size, olc::Pixel box_color = olc::WHITE, uint32_t text_scale = 1, int max_length = -1)
-            : position(pos), size(box_size), text_box_color(box_color), scale(text_scale), text_max_length(max_length) {
+            : position(pos), size(box_size), text_max_length(max_length), text_box_color(box_color), scale(text_scale) {
             cursor_pos = position.x;
         }
     
@@ -459,7 +466,7 @@ namespace olc {
 
         void Draw(olc::PixelGameEngine* pge, olc::Pixel text_color = olc::WHITE) {
 
-            int spacing = (int)(std::fabsf(size.y - 8 * scale) / 2);
+            int spacing = (int)(std::fabs(size.y - 8 * scale) / 2); // change std::fabsf to std::fabs because of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79700
             spacing = max(spacing, 1);
 
             pge->DrawRect(position, size, text_box_color);

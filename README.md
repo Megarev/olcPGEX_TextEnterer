@@ -5,7 +5,7 @@ People who've contributed to this project
 -----------------------------------------
 - **scripticuk** - for doing the key map bindings
 - **Lorenzo** - for testing and making necessary changes for Linux
-- And me too :)
+- And me too
 
 At the moment, it contains two classes
 * Text Area - For writing text in the entire window (you can set bounds too)
@@ -59,7 +59,10 @@ public:
   
   bool OnUserCreate() override {
   
-    area = olc::TextArea({ 0, 0 }); // The parameter takes the position of the starting point
+    area.Initialize({ 0, 0 }, 1, -1);
+    /*
+    	Parameters are starting position, text scale and characters_limit (-1 for no character_limit)
+    */
     return true;
   }
   

@@ -3,8 +3,8 @@ To use the extension you've to first download the [olc::PixelGameEngine](https:/
 
 People who've contributed to this project
 -----------------------------------------
-- scripticuk - for doing the key map bindings
-- Iornz - for testing and making necessary changes for Linux
+- **scripticuk** - for doing the key map bindings
+- **Iornz** - for testing and making necessary changes for Linux
 And me :)
 
 At the moment, it contains two classes

@@ -59,7 +59,7 @@ public:
   
   bool OnUserCreate() override {
   
-    area.Initialize({ 0, 0 }, 1, -1);
+    area.Initialize({ 0, 0 }, 1, { -1, -1 });
     /*
     	Parameters are starting position, text scale and characters_limit (-1 for no character_limit)
     */

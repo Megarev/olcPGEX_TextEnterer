@@ -63,7 +63,7 @@ namespace olc {
     }
 
     // Construct Font Sheet (only for rotated strings)
-    // As font sprite isn't a public member in the original header file, another font sheet has to be made
+    // As font sprite isn't a public member in the original header file, another font sheet has to be made (Use in OnUserCreate)
     void ConstructFontSheet()
     {
         std::string data;

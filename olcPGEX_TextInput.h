@@ -1,8 +1,8 @@
 /*
-        License (OLC-3)
-        ~~~~~~~~~~~~~~~
+    License (OLC-3)
+    ~~~~~~~~~~~~~~~
 	
-        Copyright 2018 - 2020 OneLoneCoder.com
+    Copyright 2018 - 2020 OneLoneCoder.com
 	Redistribution and use in source and binary forms, with or without modification,
 	are permitted provided that the following conditions are met:
 	1. Redistributions or derivations of source code must retain the above copyright
@@ -30,13 +30,18 @@
 #include "olcPixelGameEngine.h"
 #include <string>
 
-#if __linux__
-
-#undef None // None defined in /usr/include/X11/X.h
-
 #define max(a, b)  (((a) > (b)) ? (a) : (b)) 
-#define min(a, b)  (((a) < (b)) ? (a) : (b)) 
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+
+#if __linux__
+#undef None // None defined in /usr/include/X11/X.h
 #endif
+
+/*
+    +Macro implementation is added for multiple file support
+     Add #define OLC_PGEX_TEXTINPUT at the top of the main source file
+    +Added sprinting in text
+*/
 
 enum TextKey {
     None = -1,
@@ -47,63 +52,6 @@ enum TextKey {
 };
 
 namespace olc {
-
-    Sprite* font_sprite = nullptr;
-    Decal* font_decal = nullptr;
-
-    void DrawRotatedString(PixelGameEngine* pge, int32_t x, int32_t y, const std::string& sText, float angle, Pixel col = WHITE, uint32_t scale = 1);
-    void DrawRotatedString(PixelGameEngine* pge, int32_t x, int32_t y, const std::string& sText, float angle, vi2d origin = { 0, 0 }, Pixel col = WHITE, uint32_t scale = 1);
-    void DrawRotatedStringDecal(PixelGameEngine* pge, float x, float y, const std::string& sText, float angle, Pixel col = WHITE, vf2d scale = { 1.0f, 1.0f });
-    void DrawRotatedStringDecal(PixelGameEngine* pge, float x, float y, const std::string& sText, float angle, vf2d origin = { 0.0f, 0.0f }, Pixel col = WHITE, vf2d scale = { 1.0f, 1.0f });
-
-    // For clearing memory allocated for font_sprite and font_decal
-    void Clear() {
-        if (font_decal != nullptr) delete font_decal;
-        if (font_sprite != nullptr) delete font_sprite;
-    }
-
-    // Construct Font Sheet (only for rotated strings)
-    // As font sprite isn't a public member in the original header file, another font sheet has to be made (Use in OnUserCreate)
-    void ConstructFontSheet()
-    {
-        std::string data;
-        data += "?Q`0001oOch0o01o@F40o0<AGD4090LAGD<090@A7ch0?00O7Q`0600>00000000";
-        data += "O000000nOT0063Qo4d8>?7a14Gno94AA4gno94AaOT0>o3`oO400o7QN00000400";
-        data += "Of80001oOg<7O7moBGT7O7lABET024@aBEd714AiOdl717a_=TH013Q>00000000";
-        data += "720D000V?V5oB3Q_HdUoE7a9@DdDE4A9@DmoE4A;Hg]oM4Aj8S4D84@`00000000";
-        data += "OaPT1000Oa`^13P1@AI[?g`1@A=[OdAoHgljA4Ao?WlBA7l1710007l100000000";
-        data += "ObM6000oOfMV?3QoBDD`O7a0BDDH@5A0BDD<@5A0BGeVO5ao@CQR?5Po00000000";
-        data += "Oc``000?Ogij70PO2D]??0Ph2DUM@7i`2DTg@7lh2GUj?0TO0C1870T?00000000";
-        data += "70<4001o?P<7?1QoHg43O;`h@GT0@:@LB@d0>:@hN@L0@?aoN@<0O7ao0000?000";
-        data += "OcH0001SOglLA7mg24TnK7ln24US>0PL24U140PnOgl0>7QgOcH0K71S0000A000";
-        data += "00H00000@Dm1S007@DUSg00?OdTnH7YhOfTL<7Yh@Cl0700?@Ah0300700000000";
-        data += "<008001QL00ZA41a@6HnI<1i@FHLM81M@@0LG81?O`0nC?Y7?`0ZA7Y300080000";
-        data += "O`082000Oh0827mo6>Hn?Wmo?6HnMb11MP08@C11H`08@FP0@@0004@000000000";
-        data += "00P00001Oab00003OcKP0006@6=PMgl<@440MglH@000000`@000001P00000000";
-        data += "Ob@8@@00Ob@8@Ga13R@8Mga172@8?PAo3R@827QoOb@820@0O`0007`0000007P0";
-        data += "O`000P08Od400g`<3V=P0G`673IP0`@3>1`00P@6O`P00g`<O`000GP800000000";
-        data += "?P9PL020O`<`N3R0@E4HC7b0@ET<ATB0@@l6C4B0O`H3N7b0?P01L3R000000020";
-
-        font_sprite = new Sprite(128, 48);
-        int px = 0, py = 0;
-        for (size_t b = 0; b < 1024; b += 4)
-        {
-            uint32_t sym1 = (uint32_t)data[b + 0] - 48;
-            uint32_t sym2 = (uint32_t)data[b + 1] - 48;
-            uint32_t sym3 = (uint32_t)data[b + 2] - 48;
-            uint32_t sym4 = (uint32_t)data[b + 3] - 48;
-            uint32_t r = sym1 << 18 | sym2 << 12 | sym3 << 6 | sym4;
-
-            for (int i = 0; i < 24; i++)
-            {
-                int k = r & (1 << i) ? 255 : 0;
-                font_sprite->SetPixel(px, py, Pixel(k, k, k, k));
-                if (++py == 48) { px++; py = 0; }
-            }
-        }
-
-        font_decal = new Decal(font_sprite);
-    }
 
     class TextInput {
     private:
@@ -122,7 +70,7 @@ namespace olc {
             return text_enterer;
         }
 
-        char EnterText(PixelGameEngine* pge);
+        std::string EnterText(PixelGameEngine* pge);
     };
 
     class TextArea {
@@ -131,11 +79,14 @@ namespace olc {
         std::vector<std::string> lines = { "" };
         vi2d position, cursor_pos;
         uint32_t scale = 1, index = 0;
-        vi2d text_max_length = { -1, -1 };
+
+        // Is text area selected
+        bool is_selected = true;
         /*
            The maximum amount of characters each line in text area can hold
            text_max_length = -1 -> no limit to string length (for both x and y)
         */
+        vi2d text_max_length = { -1, -1 };
     public:
         TextArea() {}
         TextArea(const vi2d& start_pos, uint32_t text_scale = 1, vi2d max_length = vi2d(-1, -1))
@@ -145,7 +96,8 @@ namespace olc {
         void Initialize(int x, int y, uint32_t text_scale = 1, int max_length_x = -1, int max_length_y = -1);
 
         void Input(PixelGameEngine* pge);
-        void Draw(PixelGameEngine* pge, Pixel color = WHITE);
+        // Color is the color of text
+        void Draw(PixelGameEngine* pge, Pixel color = WHITE, bool showBorder = false, Pixel borderColor = WHITE);
 
         vi2d GetPosition() const { return position; }
         std::vector<std::string> GetStrings() const { return lines; }
@@ -156,6 +108,9 @@ namespace olc {
     private:
         vi2d position, size;
         int text_max_length = -1;
+
+        // Show a part of text in text box
+        int show_text_pos = 0;
 
         std::ostringstream text_stream;
 
@@ -169,6 +124,8 @@ namespace olc {
         vi2d offset;
         int offset_cursor;
     public:
+        enum class TextMode { NORMAL, CENTER } mode;
+
         TextBox() {}
         TextBox(const vi2d& pos, const vi2d& box_size, Pixel box_color = WHITE, uint32_t text_scale = 1, int max_length = -1)
             : position(pos), size(box_size), text_max_length(max_length), text_box_color(box_color), scale(text_scale) {
@@ -183,14 +140,20 @@ namespace olc {
         bool IsPointInBounds(const vi2d& point);
 
         void Input(PixelGameEngine* pge);
-
         void Draw(PixelGameEngine* pge, Pixel text_color = WHITE, bool is_fill = false);
+        void Draw(PixelGameEngine* pge, Pixel text_color = WHITE, Pixel box_color = BLACK, bool is_fill = false);
 
+        void SetTextMode(TextMode _mode) { mode = _mode; }
         std::string GetText() const { return text_stream.str(); }
         uint32_t GetScale() const { return scale; }
         vi2d GetPos() const { return position; }
     };
+}
 
+#ifdef OLC_PGEX_TEXTINPUT
+#undef OLC_PGEX_TEXTINPUT
+
+namespace olc {
     // Definitions of functions in classes
     // TextInput
     bool TextInput::IsTextKeyPressed(PixelGameEngine* pge, const TextKey& text_key) {
@@ -262,15 +225,15 @@ namespace olc {
         return None;
     }
 
-    char TextInput::EnterText(PixelGameEngine* pge) {
+    std::string TextInput::EnterText(PixelGameEngine* pge) {
         int index = GetAnyTextKey(pge);
-        if (index == None) return '\0';
+        if (index == None) return "";
 
         if (pge->GetKey(SHIFT).bHeld) {
-            return text_shift[index];
+            return std::string(1, text_shift[index]);
         }
 
-        return text_noshift[index];
+        return std::string(1, text_noshift[index]);
     }
 
     // TextArea
@@ -300,6 +263,25 @@ namespace olc {
     // For user input
     void TextArea::Input(PixelGameEngine* pge) {
 
+        auto IsPointInBounds = [&](const olc::vi2d& pos) {
+
+            if (text_max_length.x < 0 && text_max_length.y < 0) return true;
+
+            const olc::vi2d& size = {
+                 (text_max_length.x < 0) ? pge->ScreenWidth() : 8 * (int)scale * text_max_length.x,
+                 (text_max_length.y < 0) ? pge->ScreenHeight() : 8 * (int)scale * text_max_length.y
+            };
+
+            return (pos.x > position.x && pos.x < position.x + size.x &&
+                    pos.y > position.y && pos.y < position.y + size.y);
+        };
+
+        if (pge->GetMouse(0).bPressed) {
+            is_selected = IsPointInBounds(olc::vi2d(pge->GetMouseX(), pge->GetMouseY()));
+        }
+
+        if (!is_selected) return;
+
         auto FindPos = [&](std::string& str, int offset = 0) {
             int pos = (cursor_pos.x - position.x) / (8 * (int)scale) - offset;
             std::string::iterator it = str.begin();
@@ -323,62 +305,26 @@ namespace olc {
             return it;
         };
 
-        char c = TextInput::Get().EnterText(pge);
-        if (c != '\0') {
-            std::string str = text_stream.str();
+        auto InputText = [&]() {
+            std::string c = TextInput::Get().EnterText(pge);
+            if (c != "") {
+                std::string str = text_stream.str();
 
-            if (text_max_length.x < 0 || (text_max_length.x > 0 && (int)str.size() < text_max_length.x)) {
+                if (text_max_length.x < 0 || (text_max_length.x > 0 && (int)str.size() < text_max_length.x)) {
 
-                // Add it into the string
-                str.insert(FindPos(str), c);
-                text_stream.str("");
-                text_stream << str;
-                lines[index] = text_stream.str();
+                    // Add it into the string
+                    str.insert(FindPos(str), c[0]);
+                    text_stream.str("");
+                    text_stream << str;
+                    lines[index] = text_stream.str();
 
-                // Increase position
-                cursor_pos.x += 8 * (int)scale;
+                    // Increase position
+                    cursor_pos.x += 8 * (int)scale;
+                }
             }
-        }
+        };
 
-        if (pge->GetKey(ENTER).bPressed) {
-            if (text_max_length.y < 0 || (int)lines.size() < text_max_length.y) {
-                int pos = (cursor_pos.x - position.x) / (8 * (int)scale);
-                std::string line_string_original = lines[index].substr(0, pos); // Sub-string from 0 to pos
-                std::string line_string = lines[index].substr(pos); // Sub-string from pos to string_size
-
-                // Set original string (the line from which new line was done)
-                lines[index] = std::move(line_string_original);
-                // Insert a new string with the sub-string from pos to string_size
-                lines.insert(FindPosFromVector(1), line_string);
-                text_stream.str("");
-                text_stream << line_string;
-                index++; // Add to index variable
-            }
-        }
-
-        if (pge->GetKey(UP).bPressed) {
-            index = max(index - 1, 0); // Move the index up
-            std::string line = lines[index]; // Set string to new index
-
-            text_stream.str("");
-            text_stream << line;
-        }
-        else if (pge->GetKey(DOWN).bPressed) {
-            index = min(index + 1, lines.size() - 1); // Move the index down
-            std::string line = lines[index]; // Set string to new index
-
-            text_stream.str("");
-            text_stream << line;
-        }
-
-        if (pge->GetKey(LEFT).bPressed) {
-            cursor_pos.x -= 8 * scale;
-        }
-        else if (pge->GetKey(RIGHT).bPressed) {
-            cursor_pos.x += 8 * scale;
-        }
-
-        if (pge->GetKey(BACK).bPressed) {
+        auto ClearText = [&]() {
             if (lines[index].size() > 0 && cursor_pos.x != position.x) {
 
                 // If string length is not 0 and the cursor_pos is not the start_pos of the text area
@@ -387,6 +333,7 @@ namespace olc {
                 std::string original_str = text_stream.str();
 
                 // If string is exactly one char in size
+
                 if (original_str.size() == 1) {
                     lines[index].pop_back();
                     cursor_pos.x -= 8 * scale;
@@ -428,6 +375,88 @@ namespace olc {
                     cursor_pos.x = lines[index].size() * 8 * scale;
                 }
             }
+        };
+
+        InputText();
+
+        if (pge->GetKey(ENTER).bPressed) {
+            if (text_max_length.y < 0 || (int)lines.size() < text_max_length.y) {
+                int pos = (cursor_pos.x - position.x) / (8 * (int)scale);
+                std::string line_string_original = lines[index].substr(0, pos); // Sub-string from 0 to pos
+                std::string line_string = lines[index].substr(pos); // Sub-string from pos to string_size
+                
+                // Set original string (the line from which new line was done)
+                lines[index] = std::move(line_string_original);
+                // Insert a new string with the sub-string from pos to string_size
+                lines.insert(FindPosFromVector(1), line_string);
+                text_stream.str("");
+                text_stream << line_string;
+                index++; // Add to index variable
+            }
+        }
+        
+        if (pge->GetKey(UP).bPressed) {
+            index = max((int)index - 1, 0); // Move the index up
+            std::string line = lines[index]; // Set string to new index
+
+            text_stream.str("");
+            text_stream << line;
+        }
+        else if (pge->GetKey(DOWN).bPressed) {
+            index = min(index + 1, lines.size() - 1); // Move the index down
+            std::string line = lines[index]; // Set string to new index
+
+            text_stream.str("");
+            text_stream << line;
+        }
+
+        bool is_ctrl_pressed = pge->GetKey(CTRL).bHeld;
+
+        auto CheckNoWhiteSpace = [&](char ch) {
+            return (bool)(isalpha(ch) || isdigit(ch));
+        };
+
+        auto JumpToNextText = [&](int direction) {
+            int init_pos = (cursor_pos.x - position.x) / (8 * scale);
+
+            // Move cursor towards left, if it finds alphabets, then set this boolean flag to true
+            bool is_cursor_read_letters = false;
+
+            while (true) { 
+                if ((direction > 0 && init_pos > (int)lines[index].size() - 1) ||
+                    (direction < 0 && init_pos <= (int)(position.x / (8 * scale))) ||
+                    (lines[index][init_pos] == ' ' && is_cursor_read_letters)) break;
+                is_cursor_read_letters |= CheckNoWhiteSpace(lines[index][init_pos]);
+                init_pos += direction;
+            }
+            cursor_pos.x = 8 * scale * init_pos;
+        };
+
+        if (pge->GetKey(LEFT).bPressed) {
+            if (is_ctrl_pressed) JumpToNextText(-1);
+            else cursor_pos.x -= 8 * scale;
+        }
+        else if (pge->GetKey(RIGHT).bPressed) {
+            if (is_ctrl_pressed) JumpToNextText(1);
+            else cursor_pos.x += 8 * scale;
+        }
+
+        if (pge->GetKey(BACK).bPressed) {
+            if (is_ctrl_pressed) {
+                int init_pos = (cursor_pos.x - position.x) / (8 * scale);
+                
+                // Move cursor towards left, if it finds alphabets, then set this boolean flag to true
+                bool is_cursor_read_letters = false;
+
+                while (init_pos != position.x / (8 * scale)) { 
+                    is_cursor_read_letters |= CheckNoWhiteSpace(lines[index][init_pos - 1]);
+                    if (lines[index][init_pos - 1] == ' ' && is_cursor_read_letters) break;
+                    ClearText(); 
+                    init_pos--; 
+                }
+                cursor_pos.x = 8 * scale * init_pos;
+            }
+            ClearText();
         }
 
         // Clamp the cursor in bounds
@@ -437,7 +466,14 @@ namespace olc {
     }
 
     // Draw text to the window (color is white by default)
-    void TextArea::Draw(PixelGameEngine* pge, Pixel color) {
+    void TextArea::Draw(PixelGameEngine* pge, Pixel color, bool showBorder, Pixel borderColor) {
+
+        if (showBorder) {
+            olc::vi2d size;
+            if (text_max_length.x == -1) size = olc::vi2d(pge->ScreenWidth(), pge->ScreenHeight()) - position;
+            else size = text_max_length * 8 * scale - olc::vi2d(1, 1);
+            pge->DrawRect(position, size, borderColor);
+        }
 
         int start_pos = position.y;
         unsigned index_pos = 0;
@@ -446,7 +482,7 @@ namespace olc {
 
             pge->DrawString(position.x, start_pos, str, color, scale);
 
-            if (index_pos == index) {
+            if (index_pos == index && is_selected) {
                 pge->FillRect({ cursor_pos.x, start_pos + 8 * (int)scale - 2 }, { (int)scale * 8, (int)scale * 4 }, color);
             }
 
@@ -514,10 +550,9 @@ namespace olc {
         if (pge->GetMouse(0).bReleased) is_pressed = false;
         if (!is_selected) return;
 
-        char c = TextInput::Get().EnterText(pge);
-        auto FindPos = [&](std::string& str, int offset = 0) {
-            int pos = (cursor_pos - position.x) / (8 * (int)scale) - offset;
-            std::string::iterator it = str.begin();
+        auto FindPos = [&](const std::string& str, int offset = 0) {
+            int pos = (cursor_pos - position.x) / (8 * (int)scale) - offset + show_text_pos;
+            std::string::const_iterator it = str.begin();
             int n = 0;
             while (pos > 0 && n != pos) {
                 it++;
@@ -527,40 +562,121 @@ namespace olc {
             return it;
         };
 
-        if (c != '\0') {
-            std::string str = text_stream.str();
+        auto InputText = [&]() {
+            std::string c = TextInput::Get().EnterText(pge);
+            if (c != "") {
+                std::string str = text_stream.str();
 
-            if (text_max_length < 0 || (int)str.size() < text_max_length) {
+                if (text_max_length < 0 || (int)str.size() < text_max_length) {
 
-                // Add it into the string
-                str.insert(FindPos(str), c);
-                text_stream.str("");
-                text_stream << str;
+                    // Add it into the string
+                    str.insert(FindPos(str), c[0]);
+                    text_stream.str("");
+                    text_stream << str;
 
-                // Increase position
-                cursor_pos += 8 * (int)scale;
+                    // Increase position
+                    if (text_stream.str().size() > size.x / (8 * scale)) show_text_pos++;
+                    else cursor_pos += 8 * (int)scale;
+                }
+            }
+        };
+
+        auto ClearText = [&]() {
+           int pos = (cursor_pos - position.x) / (8 * (int)scale) + show_text_pos;
+           std::string original_str = text_stream.str();
+
+           // Check if pos >= 0 to avoid out of bounds
+           if (pos >= 0) {
+               original_str.erase(FindPos(original_str, 1));
+
+               // Set string and string at index to the original string
+               text_stream.str("");
+               text_stream << original_str;
+
+               // Move the cursor back, but not so as to make it go out of screen
+               if (show_text_pos > 0) show_text_pos--;
+               else cursor_pos -= 8 * scale;
+           }
+        };
+
+        InputText();
+
+        bool is_ctrl_pressed = pge->GetKey(CTRL).bHeld;
+
+        auto CheckNoWhiteSpace = [&](char ch) {
+            return (bool)(isalpha(ch) || isdigit(ch));
+        };
+
+        auto JumpToNextText = [&](int direction) {
+            
+            // Jump distance is the amount of characters to jump in direction
+            int init_pos = (cursor_pos - position.x) / (8 * scale) + show_text_pos;
+
+            // Move cursor towards left, if it finds alphabets, then set this boolean flag to true
+            bool is_cursor_read_letters = false;
+            const std::string& str = text_stream.str();
+
+            while (true) {
+                if ((direction > 0 && init_pos > (int)str.size() - 1) ||
+                    (direction < 0 && init_pos <= 0) ||
+                    (str[init_pos] == ' ' && is_cursor_read_letters)) break;
+                is_cursor_read_letters |= CheckNoWhiteSpace(str[init_pos]);
+                init_pos += direction;
+            
+                if (direction < 0) {
+                    if (show_text_pos > 0) show_text_pos--;
+                    else cursor_pos -= 8 * scale;
+                }
+                else {
+                    int pos = (cursor_pos - position.x) / (8 * scale);
+                    if (pos + show_text_pos < text_stream.str().size()) {
+                        if (pos == (int)(size.x / (8 * scale))) show_text_pos++;
+                        else cursor_pos += 8 * scale;
+                    }
+                }
+            }
+        };
+
+        if (pge->GetKey(LEFT).bPressed) {
+            if (is_ctrl_pressed) JumpToNextText(-1);
+            else {
+                if (show_text_pos > 0) show_text_pos--;
+                else cursor_pos -= 8 * scale;
+            }
+        }
+        else if (pge->GetKey(RIGHT).bPressed) {
+            if (is_ctrl_pressed) JumpToNextText(1);
+            else {
+                int pos = (cursor_pos - position.x) / (8 * scale);
+                if (pos + show_text_pos < text_stream.str().size()) {
+                    if (pos == (int)(size.x / (8 * scale))) show_text_pos++;
+                    else cursor_pos += 8 * scale;
+                }
             }
         }
 
         if (pge->GetKey(BACK).bPressed) {
-            int pos = (cursor_pos - position.x) / (8 * (int)scale) - 1;
-            std::string original_str = text_stream.str();
+            if (is_ctrl_pressed) {
+                int init_pos = (cursor_pos - position.x) / (8 * scale) + show_text_pos;
+                int cursor_pos_cache = cursor_pos;
 
-            // Check if pos >= 0 to avoid out of bounds
-            if (pos >= 0) {
-                original_str.erase(FindPos(original_str, 1));
+                // Move cursor towards left, if it finds alphabets, then set this boolean flag to true
+                bool is_cursor_read_letters = false;
 
-                // Set string and string at index to the original string
-                text_stream.str("");
-                text_stream << original_str;
-
-                // Move the cursor back, but not so as to make it go out of screen
-                cursor_pos -= 8 * scale;
+                while (init_pos > 0) {
+                    is_cursor_read_letters |= CheckNoWhiteSpace(text_stream.str()[init_pos-1]);
+                    if (text_stream.str()[init_pos-1] == ' ' && is_cursor_read_letters) break;
+                    ClearText();
+                    init_pos--;
+                
+                    if (show_text_pos == 0) cursor_pos_cache -= 8 * scale;
+                }
+                //int n = init_pos_cache - init_pos;
+                //cursor_pos = position.x + 8 * scale * init_pos;
+                cursor_pos = cursor_pos_cache;
             }
+            else { ClearText(); }
         }
-
-        if (pge->GetKey(LEFT).bPressed) cursor_pos -= 8 * (int)scale;
-        else if (pge->GetKey(RIGHT).bPressed) cursor_pos += 8 * (int)scale;
 
         if (cursor_pos < position.x) cursor_pos = position.x;
         else if (cursor_pos > position.x + 8 * (int)scale * (int)text_stream.str().size())
@@ -575,149 +691,18 @@ namespace olc {
 
         if (is_fill) pge->FillRect(position, size, text_box_color);
         else pge->DrawRect(position, size, text_box_color);
-        pge->DrawString(position.x + 2, position.y + spacing, text_stream.str(), text_color, scale);
+
+        std::string show_text = text_stream.str().substr(show_text_pos, size.x / (8*scale));
+        pge->DrawString(position.x + 2, position.y + spacing, show_text, text_color, scale);
 
         if (is_selected) pge->FillRect({ cursor_pos, position.y + 8 * (int)scale - 2 }, { (int)scale * 8, (int)scale * 4 }, text_color);
     }
 
-    // For Drawing Rotated Strings
-    void DrawRotatedString(PixelGameEngine* pge, int32_t x, int32_t y, const std::string& sText, float angle, Pixel col, uint32_t scale) {
-        int32_t sx = 0;
-        int32_t sy = 0;
-        Pixel::Mode m = pge->GetPixelMode();
-        int32_t text_length = (int32_t)sText.size();
-        if (col.a != 255)		pge->SetPixelMode(Pixel::ALPHA);
-        else					pge->SetPixelMode(Pixel::MASK);
-        for (auto c : sText) {
-            if (c == '\n') {
-                sx = 0; sy += 8 * scale;
-            }
-            else {
-                int32_t ox = (c - 32) % 16;
-                int32_t oy = (c - 32) / 16;
-
-                if (scale > 1) {
-                    for (uint32_t i = 0; i < 8; i++)
-                        for (uint32_t j = 0; j < 8; j++) {
-                            if (font_sprite->GetPixel(i + ox * 8, j + oy * 8).r > 0) {
-                                for (uint32_t is = 0; is < scale; is++)
-                                    for (uint32_t js = 0; js < scale; js++) {
-
-                                        vf2d points = {
-                                           x + (sx + i * scale + 8) * cosf(angle) - (sy + j * scale + 8) * sinf(angle),
-                                           y + (sx + i * scale + 8) * sinf(angle) + (sy + j * scale + 8) * cosf(angle)
-                                        };
-                                        pge->Draw((vi2d)points, col);
-                                    }
-                            }
-                        }
-                }
-                else
-                {
-                    for (uint32_t i = 0; i < 8; i++)
-                        for (uint32_t j = 0; j < 8; j++)
-                            if (font_sprite->GetPixel(i + ox * 8, j + oy * 8).r > 0) {
-                                vf2d points = {
-                                           x + (sx + i + 8) * cosf(angle) - (sy + j + 8) * sinf(angle),
-                                           y + (sx + i + 8) * sinf(angle) + (sy + j + 8) * cosf(angle)
-                                };
-                                pge->Draw((vi2d)points, col);
-                            }
-                }
-                sx += 8 * scale;
-            }
-        }
-        pge->SetPixelMode(m);
-    }
-
-    void DrawRotatedString(PixelGameEngine* pge, int32_t x, int32_t y, const std::string& sText, float angle, vi2d origin, Pixel col, uint32_t scale) {
-        int32_t sx = 0;
-        int32_t sy = 0;
-        Pixel::Mode m = pge->GetPixelMode();
-        int32_t text_length = (int32_t)sText.size();
-        if (col.a != 255)		pge->SetPixelMode(Pixel::ALPHA);
-        else					pge->SetPixelMode(Pixel::MASK);
-        for (auto c : sText) {
-            if (c == '\n') {
-                sx = 0; sy += 8 * scale;
-            }
-            else {
-                int32_t ox = (c - 32) % 16;
-                int32_t oy = (c - 32) / 16;
-
-                if (scale > 1) {
-                    for (uint32_t i = 0; i < 8; i++)
-                        for (uint32_t j = 0; j < 8; j++) {
-                            if (font_sprite->GetPixel(i + ox * 8, j + oy * 8).r > 0) {
-                                for (uint32_t is = 0; is < scale; is++)
-                                    for (uint32_t js = 0; js < scale; js++) {
-
-                                        vf2d points = {
-                                           x + (sx + i * scale + 8 - origin.x) * cosf(angle) - (sy + j * scale + 8 - origin.y) * sinf(angle),
-                                           y + (sx + i * scale + 8 - origin.x) * sinf(angle) + (sy + j * scale + 8 - origin.y) * cosf(angle)
-                                        };
-                                        pge->Draw((vi2d)points, col);
-                                    }
-                            }
-                        }
-                }
-                else
-                {
-                    for (uint32_t i = 0; i < 8; i++)
-                        for (uint32_t j = 0; j < 8; j++)
-                            if (font_sprite->GetPixel(i + ox * 8, j + oy * 8).r > 0) {
-                                vf2d points = {
-                                           x + (sx + i + 8 - origin.x) * cosf(angle) - (sy + j + 8 - origin.y) * sinf(angle),
-                                           y + (sx + i + 8 - origin.x) * sinf(angle) + (sy + j + 8 - origin.y) * cosf(angle)
-                                };
-                                pge->Draw((vi2d)points, col);
-                            }
-                }
-                sx += 8 * scale;
-            }
-        }
-        pge->SetPixelMode(m);
-    }
-
-    void DrawRotatedStringDecal(PixelGameEngine* pge, float x, float y, const std::string& sText, float angle, Pixel col, vf2d scale) {
-        vf2d spos = { 0.0f, 0.0f };
-        for (auto c : sText) {
-            if (c == '\n') {
-                spos.x = 0; spos.y += 8.0f * scale.y;
-            }
-            else {
-                int32_t ox = (c - 32) % 16;
-                int32_t oy = (c - 32) / 16;
-
-                vf2d points = {
-                      x + (spos.x + 8) * cosf(angle) - (spos.y + 8) * sinf(angle),
-                      y + (spos.x + 8) * sinf(angle) + (spos.y + 8) * cosf(angle)
-                };
-
-                pge->DrawPartialDecal(points, font_decal, { float(ox) * 8.0f, float(oy) * 8.0f }, { 8.0f, 8.0f }, scale, col);
-                spos.x += 8.0f * scale.x;
-            }
-        }
-    }
-
-    void DrawRotatedStringDecal(PixelGameEngine* pge, float x, float y, const std::string& sText, float angle, vf2d origin, Pixel col, vf2d scale) {
-        vf2d spos = { 0.0f, 0.0f };
-        for (auto c : sText) {
-            if (c == '\n') {
-                spos.x = 0; spos.y += 8.0f * scale.y;
-            }
-            else {
-                int32_t ox = (c - 32) % 16;
-                int32_t oy = (c - 32) / 16;
-
-                vf2d points = {
-                      x + (spos.x + 8 - origin.x) * cosf(angle) - (spos.y + 8 - origin.y) * sinf(angle),
-                      y + (spos.x + 8 - origin.x) * sinf(angle) + (spos.y + 8 - origin.y) * cosf(angle)
-                };
-
-                pge->DrawPartialDecal(points, font_decal, { float(ox) * 8.0f, float(oy) * 8.0f }, { 8.0f, 8.0f }, scale, col);
-                spos.x += 8.0f * scale.x;
-            }
-        }
+    void TextBox::Draw(PixelGameEngine* pge, Pixel text_color, Pixel box_color, bool is_fill) {
+        const olc::Pixel& init_color = text_box_color;
+        text_box_color = box_color;
+        Draw(pge, text_color, is_fill);
+        text_box_color = init_color;
     }
 }
+#endif

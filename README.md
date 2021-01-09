@@ -14,33 +14,8 @@ At the moment, it contains two classes
 A olc::PixelGameEngine Extension for writing text to the window in olc::PGE.
 Here is a basic program that allows you to write text
 ```cpp
-#define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
-#include "olcPGEX_TextInput.h"
-
-class TextApp : public olc::PixelGameEngine {
-private:
-  std::string text;
-public:
-  TextApp() {
-    sAppName = "Title";
-  }
-  
-  bool OnUserCreate() override {
-    
-    return true;
-  }
-  
-  bool OnUserUpdate(float fElapsedTime) override {
-    
-    char c = olc::TextInput::Get().EnterText(this);
-    if (c != '\0') text += c;
-    
-    DrawString(0, 0, text);
-    
-    return true;
-  }
-};
+std::string text;
+text += olc::TextInput::Get().EnterText(); // Returns a string
 ```
 But this only allows you enter text in a line.
 For more functionality there is **Text Area** class.
@@ -110,7 +85,7 @@ public:
 	}
 };
 ```
-You can also manually move the text boxes using the mouse, enable is_mouse_move flag in OnUserCreate()
+You can also manually move the text boxes using the mouse, just add this function in OnUserCreate
 ```cpp
 box.SetMouseMovement(true);
 ```

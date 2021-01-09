@@ -1,4 +1,5 @@
 # olcPGEX_TextEnterer
+A olc::PixelGameEngine Extension for writing text to the window in olc::PGE.
 To use the extension you've to first download the [olc::PixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine).
 
 People who've contributed to this project
@@ -11,8 +12,9 @@ At the moment, it contains two classes
 * Text Area - For writing text in the entire window (you can set bounds too)
 * Teat Box - For writing text in a box (it also has an added feature that allows you to move it with the mouse)
 
-A olc::PixelGameEngine Extension for writing text to the window in olc::PGE.
-Here is a basic program that allows you to write text
+**To use this extension you've to add _#include OLC_PGEX_TEXTINPUT_ at the top of your main source file**
+
+To write text, you use EnterText function 
 ```cpp
 std::string text;
 text += olc::TextInput::Get().EnterText(); // Returns a string
@@ -21,6 +23,7 @@ But this only allows you enter text in a line.
 For more functionality there is **Text Area** class.
 ```cpp
 #define OLC_PGE_APPLICATION
+#define OLC_PGEX_TEXTINPUT
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TextInput.h"
 
@@ -52,10 +55,10 @@ public:
 }
 ```
 **Text Area** however doesn't allow you to copy-paste and select text at the moment.
-
 There is also **Text Box**
 ```cpp
 #define OLC_PGE_APPLICATION
+#define OLC_PGEX_TEXTINPUT
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TextInput.h"
 
